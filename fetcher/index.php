@@ -7,10 +7,7 @@ require_once("fetcher.php");
 require_once("fetcher_exist.php");
 
 $parts=array(
-	"6R0411105D",
-	"96366-BH00B",
-	"15904432",
-	"KE622-BH000",
+	"54302-AV425"
 );
 
 

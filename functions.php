@@ -1,14 +1,19 @@
 <?php
 
+require_once("fetcher/browser.php");
+require_once("fetcher/fetcher.php");
+require_once("fetcher/fetcher_exist.php");
+
 /* Add bootstrap support to the Wordpress theme*/
 
 function theme_add_bootstrap() {
 	wp_enqueue_style( 'bootstrap-css', get_stylesheet_directory_uri() . '/bootstrap/css/bootstrap.min.css' );
-	wp_enqueue_style( 'bxslider-css', get_stylesheet_directory_uri() . '/bxslider/jquery.bxslider.min.css' );
+	//wp_enqueue_style( 'bxslider-css', get_stylesheet_directory_uri() . '/bxslider/jquery.bxslider.min.css' );
 	wp_deregister_script('jquery');
 	wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', array(), '3.1.1', true );
 	wp_enqueue_script( 'bootstrap-js', get_stylesheet_directory_uri() . '/bootstrap/js/bootstrap.min.js', array('jquery'), '3.0.0', true );
-	wp_enqueue_script('bxslider', get_stylesheet_directory_uri() . '/bxslider/jquery.bxslider.min.js', array('jquery'), '4.2.12', true );
+	//wp_enqueue_script('bxslider', get_stylesheet_directory_uri() . '/bxslider/jquery.bxslider.min.js', array('jquery'), '4.2.12', true );
+	wp_enqueue_script('klunker-js', get_stylesheet_directory_uri() . '/scripts.js', array('jquery'), time(), true );
 }
 
 add_action( 'wp_enqueue_scripts', 'theme_add_bootstrap' );
@@ -47,7 +52,7 @@ function codex_custom_init() {
 add_action( 'init', 'codex_custom_init' );
 
 
-/* Further reading meta boxes*/
+/* Car data meta boxes*/
 add_action( 'add_meta_boxes', 'klunker_meta' );
 function klunker_meta() {
 	add_meta_box( 'car_data_meta_1', 'Car Data', 'klunker_meta_1', 'autos', 'normal', 'high' );
@@ -333,6 +338,7 @@ function klunker_save_meta( $post_ID ) {
 	global $post;
 	if( $post->post_type == "autos" ) {
 		if (isset( $_POST ) ) {
+
 			update_post_meta( $post_ID, '_car_data_manufacturer', strip_tags( $_POST['car_data_manufacturer'] ) );
 			update_post_meta( $post_ID, '_car_data_model', strip_tags( $_POST['car_data_model'] ) );
 			update_post_meta( $post_ID, '_car_data_model_year', strip_tags( $_POST['car_data_model_year'] ) );
@@ -344,11 +350,61 @@ function klunker_save_meta( $post_ID ) {
 			update_post_meta( $post_ID, '_car_data_front_shock_absorber_price', strip_tags( trim($_POST['car_data_front_shock_absorber_price']) ) );
 			update_post_meta( $post_ID, '_car_data_front_shock_absorber_price_2', strip_tags( trim($_POST['car_data_front_shock_absorber_price_2']) ) );
 			update_post_meta( $post_ID, '_car_data_front_shock_absorber_code', strip_tags( trim($_POST['car_data_front_shock_absorber_code']) ) );
+
+			/*$fetcher_exist=new fetcher_exist(trim($_POST['car_data_front_shock_absorber_code']));
+            $fetcher_exist->fetch();
+			if ($fetcher_exist->is_ok()) {
+				update_post_meta( $post_ID, '_car_data_front_shock_absorber_price', $fetcher_exist->get_original() );
+				update_post_meta( $post_ID, '_car_data_front_shock_absorber_time', time() );
+				if ($fetcher_exist->has_replacement()) {
+					update_post_meta( $post_ID, '_car_data_front_shock_absorber_price_2', $fetcher_exist->get_replacement() );
+				} else {
+					update_post_meta( $post_ID, '_car_data_front_shock_absorber_price_2', '0' );
+				}
+			} else {
+				update_post_meta( $post_ID, '_car_data_front_shock_absorber_price', '-1' );
+			}*/
+
+
 			update_post_meta( $post_ID, '_car_data_front_spring_price', strip_tags( trim($_POST['car_data_front_spring_price']) ) );
 			update_post_meta( $post_ID, '_car_data_front_spring_price_2', strip_tags( trim($_POST['car_data_front_spring_price_2']) ) );
+
 			update_post_meta( $post_ID, '_car_data_front_spring_code', strip_tags( trim($_POST['car_data_front_spring_code']) ) );
+
+			/*$fetcher_exist=new fetcher_exist(trim($_POST['car_data_front_spring_code']));
+			$fetcher_exist->fetch();
+			if ($fetcher_exist->is_ok()) {
+				update_post_meta( $post_ID, '_car_data_front_spring_price', $fetcher_exist->get_original() );
+				update_post_meta( $post_ID, '_car_data_front_spring_time', time() );
+				if ($fetcher_exist->has_replacement()) {
+					update_post_meta( $post_ID, '_car_data_front_spring_price_2', $fetcher_exist->get_replacement() );
+				} else {
+					update_post_meta( $post_ID, '_car_data_front_spring_price_2', '0' );
+				}
+			} else {
+				update_post_meta( $post_ID, '_car_data_front_spring_price', '-1' );
+			}*/
+
 			update_post_meta( $post_ID, '_car_data_front_bush_price', strip_tags( trim($_POST['car_data_front_bush_price']) ) );
 			update_post_meta( $post_ID, '_car_data_front_bush_code', strip_tags( trim($_POST['car_data_front_bush_code']) ) );
+
+			/*if (trim($_POST['car_data_front_bush_code'])) {
+				$fetcher_exist=new fetcher_exist(trim($_POST['car_data_front_bush_code']));
+				$fetcher_exist->fetch();
+				if ($fetcher_exist->is_ok()) {
+					update_post_meta( $post_ID, '_car_data_front_bush_price', $fetcher_exist->get_original() );
+					update_post_meta( $post_ID, '_car_data_front_bush_time', time() );
+					if ($fetcher_exist->has_replacement()) {
+						update_post_meta( $post_ID, '_car_data_front_bush_price_2', $fetcher_exist->get_replacement() );
+					} else {
+						update_post_meta( $post_ID, '_car_data_front_bush_price_2', '0' );
+					}
+				} else {
+					update_post_meta( $post_ID, '_car_data_front_bush_price', '-1' );
+				}
+            }*/
+
+
 			update_post_meta( $post_ID, '_car_data_front_large_bush_price', strip_tags( trim($_POST['car_data_front_large_bush_price']) ) );
 			update_post_meta( $post_ID, '_car_data_front_large_bush_code', strip_tags( trim($_POST['car_data_front_large_bush_code']) ) );
 			update_post_meta( $post_ID, '_car_data_front_lower_arm_price', strip_tags( trim($_POST['car_data_front_lower_arm_price']) ) );
@@ -433,25 +489,126 @@ function klunker_save_meta( $post_ID ) {
 			              intval(str_replace(' ', '', $_POST['car_data_wind_screen_price']));
 
 			update_post_meta( $post_ID, '_car_data_body_total', $total_body );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		}
 	}
+}
+
+
+add_action('wp_ajax_nopriv_klunker_more_post_ajax', 'klunker_more_post_ajax');
+add_action('wp_ajax_klunker_more_post_ajax', 'klunker_more_post_ajax');
+
+if (!function_exists('klunker_more_post_ajax')) {
+	function klunker_more_post_ajax(){
+
+		$post_id = $_POST['post_id'];
+
+		$post = get_post($post_id);
+
+	  $out = '<div class="row">';
+	  $out .= '<div class="col-xs-6"><h3>Оригинал</h3></div>';
+	  $out .= '<div class="col-xs-6"><h3>Дубликат</h3></div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_shock_absorber_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_shock_absorber_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_shock_absorber_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_shock_absorber_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_spring_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_spring_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_spring_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_spring_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  if (get_post_meta( $post->ID, '_car_data_front_bush_price', true) == 0) {
+		  $out .= '<div class="col-xs-6 bg-danger"><small>В сборе с рычагом</small></div><div class="col-xs-6"></div>';
+	  } else {
+	    $out .= ( ! empty( get_post_meta( $post->ID, '_car_data_front_bush_price', true ) ) ) ? '<div class="col-xs-6">' . get_post_meta( $post->ID, '_car_data_front_bush_price', true ) . '</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	    $out .= ( ! empty( get_post_meta( $post->ID, '_car_data_front_bush_price_2', true ) ) ) ? '<div class="col-xs-6">' . get_post_meta( $post->ID, '_car_data_front_bush_price_2', true ) . '</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+    }
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_lower_arm_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_lower_arm_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_lower_arm_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_lower_arm_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_brake_disc_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_brake_disc_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_brake_disc_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_brake_disc_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_brake_pads_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_brake_pads_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_brake_pads_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_brake_pads_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  if (get_post_meta( $post->ID, '_car_data_front_hub_bearing_price', true) == 0) {
+	    $out .= '<div class="col-xs-6 bg-danger"><small>В сборе со ступицей</small></div><div class="col-xs-6"></div>';
+	  } else {
+	    $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_hub_bearing_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_hub_bearing_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	    $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_hub_bearing_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_hub_bearing_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  }
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_hub_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_hub_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_front_hub_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_front_hub_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_rear_shock_absorber_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_rear_shock_absorber_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_rear_shock_absorber_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_rear_shock_absorber_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_rear_spring_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_rear_spring_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_rear_spring_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_rear_spring_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  if (get_post_meta( $post->ID, '_car_data_rear_hub_bearing_price', true) == 0) {
+		  $out .= '<div class="col-xs-6 bg-danger"><small>В сборе со ступицей</small></div><div class="col-xs-6"></div>';
+	  } else {
+	    $out .= ( ! empty( get_post_meta( $post->ID, '_car_data_rear_hub_bearing_price', true ) ) ) ? '<div class="col-xs-6">' . get_post_meta( $post->ID, '_car_data_rear_hub_bearing_price', true ) . '</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	    $out .= ( ! empty( get_post_meta( $post->ID, '_car_data_rear_hub_bearing_price_2', true ) ) ) ? '<div class="col-xs-6">' . get_post_meta( $post->ID, '_car_data_rear_hub_bearing_price_2', true ) . '</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+    }
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_rear_hub_price', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_rear_hub_price', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= (!empty(get_post_meta( $post->ID, '_car_data_rear_hub_price_2', true))) ? '<div class="col-xs-6">'.get_post_meta( $post->ID, '_car_data_rear_hub_price_2', true).'</span></div>' : '<div class="col-xs-6">&nbsp;</div>';
+	  $out .= '</div>';
+
+	  $out .= '<div class="row">';
+
+		wp_die($out);
+	}
+}
+
+
+function klunker_car_list() {
+	$args = array(
+		'post_type'      => 'autos',
+		'posts_per_page' => -1,
+		'offset'         => 0
+	);
+
+	$out = '<select name="carselect" class="form-control car-selector" data-admin-url="'. admin_url("admin-ajax.php") .'">';
+	$out .= '<option></option>';
+
+	$myposts = get_posts( $args );
+	foreach ( $myposts as $post ) : setup_postdata( $post );
+
+		$out .= '<option value="'.$post->ID.'">'.$post->post_title.'</option>';
+
+
+	endforeach;
+	$out .= '</select>';
+
+	wp_reset_postdata();
+
+	echo $out;
 }
 
